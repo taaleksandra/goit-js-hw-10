@@ -16,7 +16,7 @@ const renderCountryList = countries => {
   const countryArray = countries.map(({ name, flags }) => {
     const countryItem = document.createElement('li');
     countryItem.classList.add('item');
-    countryItem.innerHTML = `<img class="item-img" src=${flags.svg}> <p class="item-country">${name.official}</p>`;
+    countryItem.innerHTML = `<img class="item-img" src=${flags.svg}> <p class="item-country">${name.common}</p>`;
 
     return countryItem;
   });
@@ -30,13 +30,24 @@ const renderCountryInfo = ({ name, flags, capital, population, languages }) => {
   const langArr = Object.values(languages);
   const langArrJoined = langArr.join(', ');
 
+  let cap = capital;
+  if (capital.length === 0) {
+    cap = '-';
+  }
+
+  let lang = 'Languages';
+  if (langArr.length === 1) {
+    lang = 'Language';
+  }
+
   countryList.innerHTML = '';
-  countryInfo.innerHTML = `<div class="country-info"> <img class="country-info__img" src=${flags.svg}> <h3 class="country-info__country">${name.official}</h3> </div> <div> <p class="country-info-text"><span class="country-info__caption">Capital:</span> ${capital}</p> <p class="country-info__text"><span class="country-info__caption">Population:</span> ${population}</p> <p class="country-info__text"><span class="country-info__caption">Languages:</span> ${langArrJoined}</p> </div>`;
+  countryInfo.innerHTML = `<div class="country-info"> <img class="country-info__img" src=${flags.svg}> <h3 class="country-info__country">${name.common}</h3> </div> <div> <p class="country-info-text"><span class="country-info__caption">Capital:</span> ${cap}</p> <p class="country-info__text"><span class="country-info__caption">Population:</span> ${population}</p> <p class="country-info__text"><span class="country-info__caption">${lang}:</span> ${langArrJoined}</p> </div>`;
 };
 
 // Funckja do obsługi pola tekstowego
 const inputHandler = () => {
   const countryName = inputCountryName.value;
+
   fetchCountries(countryName)
     .then(countries => {
       if (countries.length > 10) {
