@@ -11,6 +11,11 @@ const inputCountryName = document.querySelector('input#search-box');
 const countryList = document.querySelector('.country-list');
 const countryInfo = document.querySelector('.country-info');
 
+// Funkcja sprawdzająca czy wpisany tekst zawiera tylko litery i spacje
+const onlyLettersAndSpaces = str => {
+  return /^[A-Za-z\s]*$/.test(str);
+};
+
 // Funckja obsługująca dodanie pozycji do listy wyszukiwanych krajów
 const renderCountryList = countries => {
   const countryArray = countries.map(({ name, flags }) => {
@@ -47,26 +52,31 @@ const renderCountryInfo = ({ name, flags, capital, population, languages }) => {
 // Funckja do obsługi pola tekstowego
 const inputHandler = () => {
   const countryName = inputCountryName.value;
+  let onlyLett;
 
-  fetchCountries(countryName)
-    .then(countries => {
-      if (countries.length > 10) {
+  if (onlyLettersAndSpaces(countryName)) {
+    fetchCountries(countryName)
+      .then(countries => {
+        if (countries.length > 10) {
+          countryList.innerHTML = '';
+          countryInfo.innerHTML = '';
+          Notiflix.Notify.info(
+            'Too many matches found. Please enter a more specific name.'
+          );
+        } else if (countries.length === 1) {
+          return renderCountryInfo(countries[0]);
+        } else {
+          renderCountryList(countries);
+        }
+      })
+      .catch(err => {
         countryList.innerHTML = '';
         countryInfo.innerHTML = '';
-        Notiflix.Notify.info(
-          'Too many matches found. Please enter a more specific name.'
-        );
-      } else if (countries.length === 1) {
-        return renderCountryInfo(countries[0]);
-      } else {
-        renderCountryList(countries);
-      }
-    })
-    .catch(err => {
-      countryList.innerHTML = '';
-      countryInfo.innerHTML = '';
-      Notiflix.Notify.failure('Oops, there is no country with that name');
-    });
+        Notiflix.Notify.failure('Oops, there is no country with that name');
+      });
+  } else {
+    Notiflix.Notify.info('You can use only letters and spaces');
+  }
 };
 
 // Obsługa zdarzenia po wpisaniu nazwy kraju w pole tekstowe
